@@ -69,7 +69,7 @@ jobs:
                   prerelease: false
                   files: ${{ steps.package.outputs.main }}
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.TOKEN }}
 
             - name: Send Discord notification
               if: ${{ env.DISCORD_WEBHOOK != '' }}
