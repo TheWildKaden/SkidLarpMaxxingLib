@@ -24,6 +24,12 @@ jobs:
             - name: Install dependencies
               run: npm install
 
+            - name: Sync package.json dependencies
+              run: |
+                if [ -f package-lock.json ]; then
+                  npm run sync-deps || true
+                fi
+
             - name: Setup Aftman
               uses: ok-nick/setup-aftman@v0.3.0
 
@@ -124,7 +130,7 @@ EOF
                         \"author\": {
                           \"name\": \"${{ github.repository }}\",
                           \"url\": \"https://github.com/${{ github.repository }}\",
-                          \"icon_url\": \"https://raw.githubusercontent.com/Footagesus/WindUI/main/docs/logo.png\"
+                          \"icon_url\": \"https://raw.githubusercontent.com/${{ github.repository }}/main/docs/logo.png\"
                         },
                         \"fields\": [{
                           \"name\": \"Dependencies\",

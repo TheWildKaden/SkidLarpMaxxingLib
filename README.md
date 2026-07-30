@@ -28,6 +28,8 @@ Lightweight Roblox UI library originally published as WindUI. This repository co
 - Python 3 (for some helper scripts, optional)
 - Aftman (recommended) or a system `darklua` binary accessible on `PATH`
 
+Note: Building and releasing this project do not require Roblox Studio — the build pipeline runs DarkLua and other tooling on CI or your machine.
+
 See `install.sh` for an automated environment check and recommendations.
 
 ## Installing dependencies
@@ -56,8 +58,8 @@ Output: `dist/main.lua` (this is the bundled library with header metadata).
 Load the bundled library in your Roblox environment (example):
 
 ```lua
--- from raw GitHub (replace with your fork/branch if needed)
-loadstring(game:HttpGet('https://raw.githubusercontent.com/<owner>/<repo>/main/dist/main.lua'))()
+-- from raw GitHub (this repository)
+loadstring(game:HttpGet('https://raw.githubusercontent.com/TheWildKaden/SkidLarpMaxxingLib/main/dist/main.lua'))()
 
 -- or include `dist/main.lua` in your project
 local WindUI = require(path.to.dist.main)
