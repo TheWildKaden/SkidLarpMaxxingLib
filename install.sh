@@ -1,48 +1,84 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR=$(cd "$(dirname "$0")" && pwd)
+ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
+INSTALL_DIR="$HOME/.local/bin"
 
-echo "[setup] Checking environment for SkidLarpMaxxingLib"
+mkdir -p "$INSTALL_DIR"
 
-command -v git >/dev/null || { echo "git is required. Please install git."; exit 1; }
+echo "[setup] Installing system dependencies"
 
-if ! command -v node >/dev/null; then
-  echo "Node.js is not installed. On Debian/Ubuntu: sudo apt update && sudo apt install -y nodejs npm";
-  exit 1
+if command -v apt >/dev/null; then
+    sudo apt update
+    sudo apt install -y curl unzip git nodejs npm
 fi
 
-if ! command -v npm >/dev/null; then
-  echo "npm not found. Please install Node.js with npm included.";
-  exit 1
+
+echo "[setup] Installing Rokit"
+
+if ! command -v rokit >/dev/null; then
+    cd /tmp
+
+    curl -LO https://github.com/rojo-rbx/rokit/releases/latest/download/rokit-linux-x86_64.zip
+
+    unzip -o rokit-linux-x86_64.zip
+
+    chmod +x rokit
+
+    mv rokit "$INSTALL_DIR/"
+
+    export PATH="$INSTALL_DIR:$PATH"
 fi
 
-if ! command -v python3 >/dev/null; then
-  echo "python3 not found. Installing is recommended for helper scripts.";
+
+echo "[setup] Installing Wally"
+
+if ! command -v wally >/dev/null; then
+    cd /tmp
+
+    curl -LO https://github.com/UpliftGames/wally/releases/latest/download/wally-linux-x86_64.zip
+
+    unzip -o wally-linux-x86_64.zip
+
+    chmod +x wally
+
+    mv wally "$INSTALL_DIR/"
+
+    export PATH="$INSTALL_DIR:$PATH"
 fi
+
+
+echo "[setup] Installing project tools"
+
+cd "$ROOT_DIR"
+
+if command -v rokit >/dev/null; then
+    rokit add lune || true
+    rokit add darklua || true
+fi
+
 
 echo "[setup] Installing npm dependencies"
-npm install --no-audit --no-fund
 
-echo "[setup] Checking for darklua (required for builds)"
-if command -v darklua >/dev/null; then
-  echo "darklua found: $(command -v darklua)"
-else
-  if command -v aftman >/dev/null; then
-    echo "aftman found. Attempting to install tools defined in aftman.toml"
-    aftman install || echo "aftman install failed; please run 'aftman install' manually.";
-  else
-    echo "darklua not found and aftman not installed."
-    echo "Recommended: install Aftman (https://github.com/LPGhatguy/aftman) and run 'aftman install' to obtain darklua, rojo and lune.";
-    echo "Alternatively, install darklua manually and ensure it's on your PATH.";
-  fi
+if [ -f package.json ]; then
+    npm install --no-audit --no-fund
 fi
 
-echo "[setup] Run a test build to verify configuration"
-if npm run build --silent; then
-  echo "[setup] Build successful. dist/main.lua created.";
-else
-  echo "[setup] Build failed. Ensure darklua is installed and available on PATH.";
+
+echo "[setup] Adding PATH"
+
+if ! grep -q ".local/bin" "$HOME/.bashrc"; then
+    echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
 fi
 
-echo "[setup] Done."
+
+echo ""
+echo "[setup] Installed tools:"
+rokit --version 2>/dev/null || true
+wally --version 2>/dev/null || true
+lune --version 2>/dev/null || true
+darklua --version 2>/dev/null || true
+
+
+echo ""
+echo "[setup] Complete"
